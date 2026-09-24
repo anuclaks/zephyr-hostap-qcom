@@ -2576,6 +2576,148 @@ out:
 }
 
 #ifdef CONFIG_NAN
+static int wpa_drv_zep_nan_flush(void *priv)
+{
+	struct zep_drv_if_ctx *if_ctx;
+	const struct zep_wpa_supp_dev_ops *dev_ops;
+
+	if (!priv) {
+		wpa_printf(MSG_ERROR, "%s: Invalid handle", __func__);
+		return -1;
+	}
+
+	if_ctx = priv;
+	dev_ops = get_dev_ops(if_ctx->dev_ctx);
+	if (!dev_ops || !dev_ops->nan_flush) {
+		wpa_printf(MSG_ERROR, "%s: nan_flush operation not supported",
+			   __func__);
+		return -1;
+	}
+
+	return dev_ops->nan_flush(if_ctx->dev_priv);
+}
+
+static int wpa_drv_zep_nan_publish(
+	void *priv, const u8 *src, int publish_id, const char *service_name,
+	const u8 *service_id, enum nan_service_protocol_type srv_proto_type,
+	const struct wpabuf *ssi, const struct wpabuf *elems,
+	struct nan_publish_params *params, const u8 *network_id)
+{
+	struct zep_drv_if_ctx *if_ctx;
+	const struct zep_wpa_supp_dev_ops *dev_ops;
+
+	if (!priv) {
+		wpa_printf(MSG_ERROR, "%s: Invalid handle", __func__);
+		return -1;
+	}
+
+	if_ctx = priv;
+	dev_ops = get_dev_ops(if_ctx->dev_ctx);
+	if (!dev_ops || !dev_ops->nan_publish) {
+		wpa_printf(MSG_ERROR, "%s: nan_publish operation not supported",
+			   __func__);
+		return -1;
+	}
+
+	return dev_ops->nan_publish(if_ctx->dev_priv, src, publish_id,
+				    service_name, service_id, srv_proto_type,
+				    ssi, elems, params, network_id);
+}
+
+static int wpa_drv_zep_nan_cancel_publish(void *priv, int publish_id)
+{
+	struct zep_drv_if_ctx *if_ctx;
+	const struct zep_wpa_supp_dev_ops *dev_ops;
+
+	if (!priv) {
+		wpa_printf(MSG_ERROR, "%s: Invalid handle", __func__);
+		return -1;
+	}
+
+	if_ctx = priv;
+	dev_ops = get_dev_ops(if_ctx->dev_ctx);
+	if (!dev_ops || !dev_ops->nan_cancel_publish) {
+		wpa_printf(MSG_ERROR,
+			   "%s: nan_cancel_publish operation not supported",
+			   __func__);
+		return -1;
+	}
+
+	return dev_ops->nan_cancel_publish(if_ctx->dev_priv, publish_id);
+}
+
+static int wpa_drv_zep_nan_update_publish(void *priv, int publish_id,
+					  const struct wpabuf *ssi)
+{
+	struct zep_drv_if_ctx *if_ctx;
+	const struct zep_wpa_supp_dev_ops *dev_ops;
+
+	if (!priv) {
+		wpa_printf(MSG_ERROR, "%s: Invalid handle", __func__);
+		return -1;
+	}
+
+	if_ctx = priv;
+	dev_ops = get_dev_ops(if_ctx->dev_ctx);
+	if (!dev_ops || !dev_ops->nan_update_publish) {
+		wpa_printf(MSG_ERROR,
+			   "%s: nan_update_publish operation not supported",
+			   __func__);
+		return -1;
+	}
+
+	return dev_ops->nan_update_publish(if_ctx->dev_priv, publish_id, ssi);
+}
+
+static int wpa_drv_zep_nan_subscribe(
+	void *priv, const u8 *src, int subscribe_id, const char *service_name,
+	const u8 *service_id, enum nan_service_protocol_type srv_proto_type,
+	const struct wpabuf *ssi, const struct wpabuf *elems,
+	struct nan_subscribe_params *params, const u8 *network_id)
+{
+	struct zep_drv_if_ctx *if_ctx;
+	const struct zep_wpa_supp_dev_ops *dev_ops;
+
+	if (!priv) {
+		wpa_printf(MSG_ERROR, "%s: Invalid handle", __func__);
+		return -1;
+	}
+
+	if_ctx = priv;
+	dev_ops = get_dev_ops(if_ctx->dev_ctx);
+	if (!dev_ops || !dev_ops->nan_subscribe) {
+		wpa_printf(MSG_ERROR, "%s: nan_subscribe operation not supported",
+			   __func__);
+		return -1;
+	}
+
+	return dev_ops->nan_subscribe(if_ctx->dev_priv, src, subscribe_id,
+				      service_name, service_id, srv_proto_type,
+				      ssi, elems, params, network_id);
+}
+
+static int wpa_drv_zep_nan_cancel_subscribe(void *priv, int subscribe_id)
+{
+	struct zep_drv_if_ctx *if_ctx;
+	const struct zep_wpa_supp_dev_ops *dev_ops;
+
+	if (!priv) {
+		wpa_printf(MSG_ERROR, "%s: Invalid handle", __func__);
+		return -1;
+	}
+
+	if_ctx = priv;
+	dev_ops = get_dev_ops(if_ctx->dev_ctx);
+	if (!dev_ops || !dev_ops->nan_cancel_subscribe) {
+		wpa_printf(MSG_ERROR,
+			   "%s: nan_cancel_subscribe operation not supported",
+			   __func__);
+		return -1;
+	}
+
+	return dev_ops->nan_cancel_subscribe(if_ctx->dev_priv, subscribe_id);
+}
+
 static int wpa_drv_zep_nan_start(void *priv,
 				 const struct nan_cluster_config *conf)
 {
@@ -3489,6 +3631,12 @@ const struct wpa_driver_ops wpa_driver_zep_ops = {
 	.set_country = wpa_drv_zep_set_country,
 	.get_country = wpa_drv_zep_get_country,
 #ifdef CONFIG_NAN
+	.nan_flush = wpa_drv_zep_nan_flush,
+	.nan_publish = wpa_drv_zep_nan_publish,
+	.nan_cancel_publish = wpa_drv_zep_nan_cancel_publish,
+	.nan_update_publish = wpa_drv_zep_nan_update_publish,
+	.nan_subscribe = wpa_drv_zep_nan_subscribe,
+	.nan_cancel_subscribe = wpa_drv_zep_nan_cancel_subscribe,
 	.nan_start = wpa_drv_zep_nan_start,
 	.nan_change_config = wpa_drv_zep_nan_change_config,
 	.nan_stop = wpa_drv_zep_nan_stop,

@@ -341,6 +341,31 @@ struct zep_wpa_supp_dev_ops {
 
 	int (*get_country)(void *priv, char *alpha2);
 
+	/** Flush all NAN offload services. */
+	int (*nan_flush)(void *if_priv);
+	/** Add a NAN publish service to firmware. */
+	int (*nan_publish)(void *if_priv, const u8 *src, int publish_id,
+			  const char *service_name, const u8 *service_id,
+			  enum nan_service_protocol_type srv_proto_type,
+			  const struct wpabuf *ssi,
+			  const struct wpabuf *elems,
+			  struct nan_publish_params *params,
+			  const u8 *network_id);
+	/** Remove a NAN publish service from firmware. */
+	int (*nan_cancel_publish)(void *if_priv, int publish_id);
+	/** Update the SSI of a NAN publish service. */
+	int (*nan_update_publish)(void *if_priv, int publish_id,
+				 const struct wpabuf *ssi);
+	/** Add a NAN subscribe service to firmware. */
+	int (*nan_subscribe)(void *if_priv, const u8 *src, int subscribe_id,
+			    const char *service_name, const u8 *service_id,
+			    enum nan_service_protocol_type srv_proto_type,
+			    const struct wpabuf *ssi,
+			    const struct wpabuf *elems,
+			    struct nan_subscribe_params *params,
+			    const u8 *network_id);
+	/** Remove a NAN subscribe service from firmware. */
+	int (*nan_cancel_subscribe)(void *if_priv, int subscribe_id);
 	/** Start or join a NAN cluster. */
 	int (*nan_start)(void *if_priv,
 			const struct nan_cluster_config *conf);
